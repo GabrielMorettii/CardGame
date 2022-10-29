@@ -52,6 +52,12 @@ export class AuthService {
     return await this.signToken(userExists.id);
   }
 
+  public async googleLogin(req) {
+    if (!req.user) throw new BadRequestException('User from google is invalid');
+
+    return await this.signToken(req.user.id);
+  }
+
   async signToken(userId: string): Promise<{ access_token: string }> {
     const payload = {
       sub: userId,
@@ -67,11 +73,5 @@ export class AuthService {
     return {
       access_token: token,
     };
-  }
-
-  public googleLogin(req) {
-    if (!req.user) throw new BadRequestException('User from google is invalid');
-
-    return { user: req.user };
   }
 }

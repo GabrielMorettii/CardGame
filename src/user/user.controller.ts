@@ -11,6 +11,6 @@ export class UserController {
 
   @Get('me')
   private async getMe(@GetUser() user: User) {
-    console.log(user);
+    return user;
   }
 }
