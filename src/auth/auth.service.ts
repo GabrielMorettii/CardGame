@@ -4,9 +4,8 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { PrismaService } from 'prisma/prisma.service';
-import { CreateUserDto } from './dtos';
+import { AuthUserDto, CreateUserDto } from './dtos';
 import * as argon2 from 'argon2';
-import { AuthUserDto } from './dtos/AuthUserDto';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 @Injectable()
