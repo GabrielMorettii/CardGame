@@ -11,6 +11,7 @@ import {
 import { AuthService } from './auth.service';
 import { CreateUserDto } from './dtos';
 import { AuthUserDto } from './dtos/AuthUserDto';
+import { GithubGuard } from './guards';
 import { GoogleGuard } from './guards/google.guard';
 
 @Controller('auth')
@@ -37,6 +38,18 @@ export class AuthController {
   @Get('google/callback')
   @UseGuards(GoogleGuard)
   private async googleCallback(@Req() req) {
-    return await this.authService.googleLogin(req);
+    return await this.authService.oAuthLogin(req);
+  }
+
+  @Get('github')
+  @UseGuards(GithubGuard)
+  private async githubAuth() {
+    return;
+  }
+
+  @Get('github/callback')
+  @UseGuards(GithubGuard)
+  private async githubCallback(@Req() req) {
+    return await this.authService.oAuthLogin(req);
   }
 }

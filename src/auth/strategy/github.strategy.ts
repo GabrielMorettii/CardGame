@@ -1,17 +1,17 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
-import { Strategy, VerifyCallback } from 'passport-google-oauth2';
+import { Strategy } from 'passport-github2';
+import { VerifyCallback } from 'passport-google-oauth2';
 import { PrismaService } from 'prisma/prisma.service';
 
 @Injectable()
-export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
+export class GithubStrategy extends PassportStrategy(Strategy, 'github') {
   constructor(config: ConfigService, private prismaService: PrismaService) {
     super({
-      clientID: config.get('GOOGLE_CLIENT_ID'),
-      clientSecret: config.get('GOOGLE_SECRET'),
-      callbackURL: config.get('GOOGLE_CALL_BACK_URL'),
-      scope: ['email', 'profile'],
+      clientID: config.get('GITHUB_CLIENT_ID'),
+      clientSecret: config.get('GITHUB_CLIENT_SECRET'),
+      callbackURL: config.get('GITHUB_CALL_BACK_URL'),
     });
   }
 
@@ -23,19 +23,19 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
   ) {
     try {
       const userAlreadyExists = await this.prismaService.user.findUnique({
-        where: { googleId: profile.id },
+        where: { githubId: profile.id },
       });
 
       if (userAlreadyExists) {
         return done(null, userAlreadyExists);
       }
 
-      const { email, displayName, id } = profile;
+      const { emails, displayName, id } = profile;
 
       const data = {
         name: displayName,
-        email,
-        googleId: id,
+        email: emails[0].value,
+        githubId: id,
       };
 
       const emailAlreadyUsed = await this.prismaService.user.findFirst({

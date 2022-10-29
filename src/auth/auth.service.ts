@@ -52,7 +52,7 @@ export class AuthService {
     return await this.signToken(userExists.id);
   }
 
-  public async googleLogin(req) {
+  public async oAuthLogin(req) {
     if (!req.user) throw new BadRequestException('User from google is invalid');
 
     return await this.signToken(req.user.id);
