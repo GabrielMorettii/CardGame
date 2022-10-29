@@ -68,4 +68,10 @@ export class AuthService {
       access_token: token,
     };
   }
+
+  public googleLogin(req) {
+    if (!req.user) throw new BadRequestException('User from google is invalid');
+
+    return { user: req.user };
+  }
 }
