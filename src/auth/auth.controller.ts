@@ -14,9 +14,14 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { BadRequestDto, UnauthorizedDto, UserEntityDto } from 'static/dtos';
+import { CreateUserDto, UserEntityDto } from 'prisma/dtos';
+import {
+  AuthResponseDto,
+  AuthUserDto,
+  BadRequestDto,
+  UnauthorizedDto,
+} from 'static/dtos';
 import { AuthService } from './auth.service';
-import { AuthResponseDto, AuthUserDto, CreateUserDto } from './dtos';
 import { GithubGuard } from './guards';
 import { GoogleGuard } from './guards/google.guard';
 
@@ -47,6 +52,10 @@ export class AuthController {
     status: 200,
     description: 'Sucessfully logged',
     type: AuthResponseDto,
+  })
+  @ApiResponse({
+    status: 400,
+    type: BadRequestDto,
   })
   @ApiResponse({
     status: 401,
