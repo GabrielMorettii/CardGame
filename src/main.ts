@@ -15,11 +15,12 @@ async function bootstrap() {
       trade their players cards, where each card has it own status like fifa fut card`,
     )
     .setVersion('1.0.0')
+    .addBearerAuth()
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
 
-  SwaggerModule.setup('docs', app, document);
+  SwaggerModule.setup('/', app, document);
 
   await app.listen(process.env.PORT || 3000);
 }

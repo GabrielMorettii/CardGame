@@ -1,7 +1,6 @@
 import {
   Body,
   Controller,
-  ForbiddenException,
   Get,
   Param,
   Patch,
@@ -10,7 +9,6 @@ import {
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
-  ApiForbiddenResponse,
   ApiOperation,
   ApiResponse,
   ApiTags,
