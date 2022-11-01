@@ -16,6 +16,8 @@ model User {
   name     String
   password String?
 
+  role String? @default("member")
+
   googleId String? @unique
   githubId String? @unique
 

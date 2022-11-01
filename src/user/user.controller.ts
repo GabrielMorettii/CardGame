@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  ForbiddenException,
   Get,
   Param,
   Patch,
@@ -9,16 +10,22 @@ import {
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
+  ApiForbiddenResponse,
   ApiOperation,
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
 import { User } from '@prisma/client';
-import { GetUser } from 'auth/decorators';
-import { JwtGuard } from 'auth/guards';
+import { GetUser, Roles } from 'auth/decorators';
+import { JwtGuard, RolesGuard } from 'auth/guards';
 import { UpdateUserDto, UserEntityDto } from 'prisma/dtos';
 import { STATIC_SUCCESSES } from 'static';
-import { BadRequestDto, SuccessDto, UnauthorizedDto } from 'static/dtos';
+import {
+  BadRequestDto,
+  ForbiddenResponse,
+  SuccessDto,
+  UnauthorizedDto,
+} from 'static/dtos';
 import { UserService } from './user.service';
 
 @UseGuards(JwtGuard)
@@ -58,6 +65,12 @@ export class UserController {
     status: 401,
     type: UnauthorizedDto,
   })
+  @ApiResponse({
+    status: 403,
+    type: ForbiddenResponse,
+  })
+  @UseGuards(RolesGuard)
+  @Roles('admin')
   private async listOne(@Param('id') id: string) {
     return await this.userService.listOne(id);
   }
@@ -74,6 +87,8 @@ export class UserController {
     status: 401,
     type: UnauthorizedDto,
   })
+  @UseGuards(RolesGuard)
+  @Roles('admin')
   private async listAll() {
     return await this.userService.listAll();
   }
@@ -95,8 +110,9 @@ export class UserController {
   private async updateUser(
     @Param('id') id: string,
     @Body() data: UpdateUserDto,
+    @GetUser() user: UserEntityDto,
   ) {
-    return await this.userService.update(id, data);
+    return await this.userService.update(id, data, user);
   }
 
   @Patch('inactivate/:id')
@@ -113,6 +129,12 @@ export class UserController {
     status: 401,
     type: UnauthorizedDto,
   })
+  @ApiResponse({
+    status: 403,
+    type: ForbiddenResponse,
+  })
+  @UseGuards(RolesGuard)
+  @Roles('admin')
   private async inactiveUser(@Param('id') id: string) {
     await this.userService.inactivate(id);
 
@@ -133,6 +155,12 @@ export class UserController {
     status: 401,
     type: UnauthorizedDto,
   })
+  @ApiResponse({
+    status: 403,
+    type: ForbiddenResponse,
+  })
+  @UseGuards(RolesGuard)
+  @Roles('admin')
   private async activateUser(@Param('id') id: string) {
     await this.userService.activate(id);
 

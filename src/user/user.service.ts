@@ -1,5 +1,9 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
-import { UpdateUserDto } from 'prisma/dtos';
+import {
+  BadRequestException,
+  ForbiddenException,
+  Injectable,
+} from '@nestjs/common';
+import { UpdateUserDto, UserEntityDto } from 'prisma/dtos';
 import { PrismaService } from 'prisma/prisma.service';
 
 @Injectable()
@@ -33,7 +37,7 @@ export class UserService {
     return users;
   }
 
-  public async update(id: string, data: UpdateUserDto) {
+  public async update(id: string, data: UpdateUserDto, user: UserEntityDto) {
     data.updatedAt = new Date();
 
     const userExists = await this.prismaService.user.findUnique({
@@ -41,6 +45,11 @@ export class UserService {
     });
 
     if (!userExists) throw new BadRequestException('User does not exists');
+
+    if (data.role && user.role === 'member')
+      throw new ForbiddenException('You dont have the permission to do this!');
+    else if (userExists.id !== id && user.role === 'member')
+      throw new ForbiddenException('You dont have the permission to do this!');
 
     const updatedUser = await this.prismaService.user.update({
       where: {

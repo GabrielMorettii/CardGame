@@ -10,7 +10,10 @@ async function bootstrap() {
 
   const config = new DocumentBuilder()
     .setTitle('CardGame API')
-    .setDescription('The CardGame api description')
+    .setDescription(
+      `The CardGame API was built to be useful in as a system that provides a way to players can 
+      trade their players cards, where each card has it own status like fifa fut card`,
+    )
     .setVersion('1.0.0')
     .build();
 

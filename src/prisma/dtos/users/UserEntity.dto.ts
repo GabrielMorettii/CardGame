@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { User } from '@prisma/client';
+import { Role } from './CreateUser.dto';
 
 export class UserEntityDto implements User {
   @ApiProperty()
@@ -18,6 +19,8 @@ export class UserEntityDto implements User {
 
   @ApiProperty()
   githubId: string;
+
+  role: Role;
 
   @ApiProperty()
   createdAt: Date;
