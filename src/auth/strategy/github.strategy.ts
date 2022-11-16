@@ -23,7 +23,7 @@ export class GithubStrategy extends PassportStrategy(Strategy, 'github') {
   ) {
     try {
       const userAlreadyExists = await this.usersRepository.findOne({
-        where: { githubId: profile.id },
+        githubId: profile.id,
       });
 
       if (userAlreadyExists) {
@@ -39,17 +39,13 @@ export class GithubStrategy extends PassportStrategy(Strategy, 'github') {
       };
 
       const emailAlreadyUsed = await this.usersRepository.findOne({
-        where: {
-          email: data.email,
-        },
+        email: data.email,
       });
 
       if (emailAlreadyUsed)
         throw new BadRequestException('The email is already used');
 
-      const newUser = await this.usersRepository.create({
-        data,
-      });
+      const newUser = await this.usersRepository.create(data);
 
       return done(null, newUser);
     } catch (error) {

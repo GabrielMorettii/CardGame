@@ -13,7 +13,6 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { User } from '@prisma/client';
 import { GetUser, Roles } from 'auth/decorators';
 import { JwtGuard, RolesGuard } from 'auth/guards';
 import { UpdateUserDto, UserEntityDto } from '../database/dtos';
@@ -44,7 +43,7 @@ export class UserController {
     status: 401,
     type: UnauthorizedDto,
   })
-  private async getMe(@GetUser() user: User) {
+  private async getMe(@GetUser() user: UserEntityDto) {
     return user;
   }
 

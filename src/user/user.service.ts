@@ -11,11 +11,12 @@ export class UserService {
   constructor(private usersRepository: UsersRepository) {}
 
   public async listOne(id: string) {
-    const userExists = await this.usersRepository.findOne({ id });
+    const userExists = await this.usersRepository.findOne(
+      { _id: id },
+      { __v: 0 },
+    );
 
     if (!userExists) throw new BadRequestException('User does not exists');
-
-    delete userExists.password;
 
     return userExists;
   }
@@ -23,73 +24,65 @@ export class UserService {
   public async listAll() {
     const users = await this.usersRepository.find(
       {
-        where: { inactivatedAt: null },
+        inactivatedAt: null,
       },
-      { password: -1 },
+      { __v: 0 },
     );
 
     return users;
   }
 
   public async update(id: string, data: UpdateUserDto, user: UserEntityDto) {
-    // data.updatedAt = new Date();
-    // const userExists = await this.prismaService.user.findUnique({
-    //   where: { id },
-    // });
-    // if (!userExists) throw new BadRequestException('User does not exists');
-    // if (data.role && user.role === 'member')
-    //   throw new ForbiddenException('You dont have the permission to do this!');
-    // else if (userExists.id !== id && user.role === 'member')
-    //   throw new ForbiddenException('You dont have the permission to do this!');
-    // const updatedUser = await this.prismaService.user.update({
-    //   where: {
-    //     id,
-    //   },
-    //   data,
-    // });
-    // delete updatedUser.password;
-    // return updatedUser;
+    const userExists = await this.usersRepository.findOne({
+      _id: id,
+    });
+
+    if (!userExists) throw new BadRequestException('User does not exists');
+
+    if (data.role && user.role === 'member')
+      throw new ForbiddenException('You dont have the permission to do this!');
+    else if (userExists.id !== id && user.role === 'member')
+      throw new ForbiddenException('You dont have the permission to do this!');
+
+    const updatedUser = await this.usersRepository.findOneAndUpdate(
+      {
+        _id: id,
+      },
+      data,
+    );
+
+    delete updatedUser.password;
+
+    return updatedUser;
   }
 
   public async inactivate(id: string) {
-    // const userExists = await this.prismaService.user.findUnique({
-    //   where: { id },
-    // });
+    const userExists = await this.usersRepository.findOne({ _id: id });
 
-    // if (!userExists) throw new BadRequestException('User does not exists');
+    if (!userExists) throw new BadRequestException('User does not exists');
 
-    // await this.prismaService.user.update({
-    //   where: {
-    //     id,
-    //   },
-    //   data: {
-    //     inactivatedAt: new Date(),
-    //     updatedAt: new Date(),
-    //   },
-    // });
+    const isInactivated = await this.usersRepository.inactivate({
+      _id: id,
+    });
 
-    return true;
+    if (isInactivated) return true;
+
+    throw new BadRequestException('Something went wrong during inactivaction!');
   }
 
   public async activate(id: string) {
-    // const userExists = await this.prismaService.user.findUnique({
-    //   where: { id },
-    // });
+    const userExists = await this.usersRepository.findOne({ _id: id });
 
-    // if (!userExists) throw new BadRequestException('User does not exists');
-    // else if (!userExists.inactivatedAt)
-    //   throw new BadRequestException('User is already activated!');
+    if (!userExists) throw new BadRequestException('User does not exists');
+    else if (!userExists.inactivatedAt)
+      throw new BadRequestException('User is already activated!');
 
-    // await this.prismaService.user.update({
-    //   where: {
-    //     id,
-    //   },
-    //   data: {
-    //     updatedAt: new Date(),
-    //     inactivatedAt: null,
-    //   },
-    // });
+    const isActivated = await this.usersRepository.activate({
+      _id: id,
+    });
 
-    return true;
+    if (isActivated) return true;
+
+    throw new BadRequestException('Something went wrong during activaction!');
   }
 }

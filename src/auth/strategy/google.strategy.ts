@@ -23,7 +23,7 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
   ) {
     try {
       const userAlreadyExists = await this.usersRepository.findOne({
-        where: { googleId: profile.id },
+        googleId: profile.id,
       });
 
       if (userAlreadyExists) {
@@ -39,17 +39,13 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
       };
 
       const emailAlreadyUsed = await this.usersRepository.findOne({
-        where: {
-          email: data.email,
-        },
+        email: data.email,
       });
 
       if (emailAlreadyUsed)
         throw new BadRequestException('The email is already used');
 
-      const newUser = await this.usersRepository.create({
-        data,
-      });
+      const newUser = await this.usersRepository.create(data);
 
       return done(null, newUser);
     } catch (error) {

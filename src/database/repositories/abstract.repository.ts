@@ -9,8 +9,6 @@ export abstract class EntityRepository<T extends Document> {
   ): Promise<T | null> {
     return this.entityModel
       .findOne(entityFilterQuery, {
-        _id: 0,
-        __v: 0,
         ...projection,
       })
       .exec();
@@ -25,6 +23,7 @@ export abstract class EntityRepository<T extends Document> {
 
   async create(createEntityData: unknown): Promise<T> {
     const entity = new this.entityModel(createEntityData);
+
     return entity.save();
   }
 
@@ -34,7 +33,7 @@ export abstract class EntityRepository<T extends Document> {
   ): Promise<T | null> {
     return this.entityModel.findOneAndUpdate(
       entityFilterQuery,
-      updateEntityData,
+      { ...updateEntityData, updatedAt: new Date() },
       {
         new: true,
       },
@@ -44,5 +43,25 @@ export abstract class EntityRepository<T extends Document> {
   async deleteMany(entityFilterQuery: FilterQuery<T>): Promise<boolean> {
     const deleteResult = await this.entityModel.deleteMany(entityFilterQuery);
     return deleteResult.deletedCount >= 1;
+  }
+
+  async inactivate(entityFilterQuery: FilterQuery<T>): Promise<boolean> {
+    const inactivateResult = await this.entityModel.findOneAndUpdate(
+      entityFilterQuery,
+      { inactivatedAt: new Date() },
+      { new: true },
+    );
+
+    return inactivateResult ? true : false;
+  }
+
+  async activate(entityFilterQuery: FilterQuery<T>): Promise<boolean> {
+    const activateResult = await this.entityModel.findOneAndUpdate(
+      entityFilterQuery,
+      { inactivatedAt: null },
+      { new: true },
+    );
+
+    return activateResult ? true : false;
   }
 }

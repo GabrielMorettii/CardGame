@@ -15,7 +15,7 @@ export class User {
   @Prop()
   name: string;
 
-  @Prop()
+  @Prop({ select: false })
   password: string;
 
   @Prop()
@@ -30,7 +30,7 @@ export class User {
   })
   role: Role;
 
-  @Prop()
+  @Prop({ default: new Date() })
   createdAt: Date;
 
   @Prop()
@@ -41,3 +41,11 @@ export class User {
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
+
+// model Team{}
+
+// model Player{}
+
+// model Card{}
+
+// model UserCards{}

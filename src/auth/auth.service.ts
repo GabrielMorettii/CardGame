@@ -19,7 +19,7 @@ export class AuthService {
 
   public async signup(data: CreateUserDto) {
     const emailAlreadyExists = await this.usersRepository.findOne({
-      where: { email: data.email },
+      email: data.email,
     });
 
     if (emailAlreadyExists)
@@ -27,17 +27,20 @@ export class AuthService {
 
     data.password = await argon2.hash(data.password);
 
-    const user = await this.usersRepository.create({ data });
+    const user = await this.usersRepository.create(data);
 
-    delete user.password;
+    user.password = undefined;
 
     return user;
   }
 
   public async signin(data: AuthUserDto) {
-    const userExists = await this.usersRepository.findOne({
-      where: { email: data.email },
-    });
+    const userExists = await this.usersRepository.findOne(
+      {
+        email: data.email,
+      },
+      { password: 1 },
+    );
 
     if (!userExists) throw new UnauthorizedException('Invalid credentials!');
 
@@ -49,7 +52,7 @@ export class AuthService {
     if (!passwordsMatches)
       throw new UnauthorizedException('Invalid credentials!');
 
-    return await this.signToken(userExists.id);
+    return await this.signToken(userExists._id);
   }
 
   public async oAuthLogin(req) {
