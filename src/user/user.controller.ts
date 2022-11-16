@@ -16,7 +16,7 @@ import {
 import { User } from '@prisma/client';
 import { GetUser, Roles } from 'auth/decorators';
 import { JwtGuard, RolesGuard } from 'auth/guards';
-import { UpdateUserDto, UserEntityDto } from 'prisma/dtos';
+import { UpdateUserDto, UserEntityDto } from '../database/dtos';
 import { STATIC_SUCCESSES } from 'static';
 import {
   BadRequestDto,

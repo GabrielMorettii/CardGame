@@ -14,7 +14,7 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { CreateUserDto, UserEntityDto } from 'prisma/dtos';
+import { CreateUserDto, UserEntityDto } from '../database/dtos';
 import {
   AuthResponseDto,
   AuthUserDto,

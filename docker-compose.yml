@@ -1,11 +1,14 @@
 version: '3.8'
 
 services:
-  dev-db:
-    image: postgres:13
+  mongodb:
+    image: mongo
+    container_name: mongodb
     ports:
-      - 5432:5432
+      - 27017:27017
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: cardgame
+      - PUID=1000
+      - PGID=1000
+    volumes:
+      - /home/moretti/mongodb/database:/data/db
+    restart: unless-stopped
