@@ -45,23 +45,23 @@ export abstract class EntityRepository<T extends Document> {
     return deleteResult.deletedCount >= 1;
   }
 
-  async inactivate(entityFilterQuery: FilterQuery<T>): Promise<boolean> {
+  async inactivate(entityFilterQuery: FilterQuery<T>): Promise<T> {
     const inactivateResult = await this.entityModel.findOneAndUpdate(
       entityFilterQuery,
       { inactivatedAt: new Date() },
       { new: true },
     );
 
-    return inactivateResult ? true : false;
+    return inactivateResult;
   }
 
-  async activate(entityFilterQuery: FilterQuery<T>): Promise<boolean> {
+  async activate(entityFilterQuery: FilterQuery<T>): Promise<T> {
     const activateResult = await this.entityModel.findOneAndUpdate(
       entityFilterQuery,
       { inactivatedAt: null },
       { new: true },
     );
 
-    return activateResult ? true : false;
+    return activateResult;
   }
 }

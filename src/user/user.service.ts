@@ -53,6 +53,10 @@ export class UserService {
 
     delete updatedUser.password;
 
+    if (updatedUser) {
+      await this.usersRepository.setUserCache(updatedUser);
+    }
+
     return updatedUser;
   }
 
@@ -61,11 +65,15 @@ export class UserService {
 
     if (!userExists) throw new BadRequestException('User does not exists');
 
-    const isInactivated = await this.usersRepository.inactivate({
+    const inactivatedUser = await this.usersRepository.inactivate({
       _id: id,
     });
 
-    if (isInactivated) return true;
+    if (inactivatedUser) {
+      await this.usersRepository.setUserCache(inactivatedUser);
+
+      return true;
+    }
 
     throw new BadRequestException('Something went wrong during inactivaction!');
   }
@@ -77,11 +85,15 @@ export class UserService {
     else if (!userExists.inactivatedAt)
       throw new BadRequestException('User is already activated!');
 
-    const isActivated = await this.usersRepository.activate({
+    const activatedUser = await this.usersRepository.activate({
       _id: id,
     });
 
-    if (isActivated) return true;
+    if (activatedUser) {
+      await this.usersRepository.setUserCache(activatedUser);
+
+      return true;
+    }
 
     throw new BadRequestException('Something went wrong during activaction!');
   }
