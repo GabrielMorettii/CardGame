@@ -1,0 +1,18 @@
+[
+  {
+    "_id":"6375ff6b17620042f7aae2c4",
+    "email":"gabrielmorettiadm@gmail.com",
+    "name":"gabrielmorettiadm",
+    "password":"$argon2id$v=19$m=65536,t=3,p=4$d3+QUUX94d9Zr64+AsCnBQ$xNos3xP1k5zF+z1dK3U924xDP/NKsQ/RfA1D7bXxBNw",
+    "role":"admin",
+    "createdAt":"2022-11-01 12:13:01.245"
+  },
+  {
+    "_id":"6375ff6b17620042f7aae2c5",
+    "email":"gabrielmorettimember@gmail.com",
+    "name":"gabrielmorettimember",
+    "password":"$argon2id$v=19$m=65536,t=3,p=4$zXq5hDczVKn3u3+a2p4dxw$GXgFBteoLSXB7QBTbdU+fwUv0mJ8qaU6ZJpxTJd7Jvs",
+    "role":"member",
+    "createdAt":"2022-11-01 12:13:01.245"
+  }
+]

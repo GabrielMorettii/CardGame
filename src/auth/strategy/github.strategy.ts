@@ -1,13 +1,13 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
+import { UsersRepository } from 'database/repositories';
 import { Strategy } from 'passport-github2';
 import { VerifyCallback } from 'passport-google-oauth2';
-import { PrismaService } from 'prisma/prisma.service';
 
 @Injectable()
 export class GithubStrategy extends PassportStrategy(Strategy, 'github') {
-  constructor(config: ConfigService, private prismaService: PrismaService) {
+  constructor(config: ConfigService, private usersRepository: UsersRepository) {
     super({
       clientID: config.get('GITHUB_CLIENT_ID'),
       clientSecret: config.get('GITHUB_CLIENT_SECRET'),
@@ -22,8 +22,8 @@ export class GithubStrategy extends PassportStrategy(Strategy, 'github') {
     done: VerifyCallback,
   ) {
     try {
-      const userAlreadyExists = await this.prismaService.user.findUnique({
-        where: { githubId: profile.id },
+      const userAlreadyExists = await this.usersRepository.findOne({
+        githubId: profile.id,
       });
 
       if (userAlreadyExists) {
@@ -38,18 +38,14 @@ export class GithubStrategy extends PassportStrategy(Strategy, 'github') {
         githubId: id,
       };
 
-      const emailAlreadyUsed = await this.prismaService.user.findFirst({
-        where: {
-          email: data.email,
-        },
+      const emailAlreadyUsed = await this.usersRepository.findOne({
+        email: data.email,
       });
 
       if (emailAlreadyUsed)
         throw new BadRequestException('The email is already used');
 
-      const newUser = await this.prismaService.user.create({
-        data,
-      });
+      const newUser = await this.usersRepository.create(data);
 
       return done(null, newUser);
     } catch (error) {

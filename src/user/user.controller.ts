@@ -1,11 +1,13 @@
 import {
   Body,
+  CacheInterceptor,
   Controller,
   Get,
   Param,
   Patch,
   Put,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
@@ -13,10 +15,9 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { User } from '@prisma/client';
 import { GetUser, Roles } from 'auth/decorators';
 import { JwtGuard, RolesGuard } from 'auth/guards';
-import { UpdateUserDto, UserEntityDto } from 'prisma/dtos';
+import { UpdateUserDto, UserEntityDto } from '../database/dtos';
 import { STATIC_SUCCESSES } from 'static';
 import {
   BadRequestDto,
@@ -44,7 +45,7 @@ export class UserController {
     status: 401,
     type: UnauthorizedDto,
   })
-  private async getMe(@GetUser() user: User) {
+  private async getMe(@GetUser() user: UserEntityDto) {
     return user;
   }
 

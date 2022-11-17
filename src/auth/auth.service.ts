@@ -3,23 +3,23 @@ import {
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
-import { PrismaService } from 'prisma/prisma.service';
 import * as argon2 from 'argon2';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
-import { CreateUserDto } from 'prisma/dtos';
+import { CreateUserDto } from '../database/dtos';
 import { AuthUserDto } from 'static/dtos';
+import { UsersRepository } from 'database/repositories';
 @Injectable()
 export class AuthService {
   constructor(
-    private prismaService: PrismaService,
+    private usersRepository: UsersRepository,
     private config: ConfigService,
     private jwt: JwtService,
   ) {}
 
   public async signup(data: CreateUserDto) {
-    const emailAlreadyExists = await this.prismaService.user.findFirst({
-      where: { email: data.email },
+    const emailAlreadyExists = await this.usersRepository.findOne({
+      email: data.email,
     });
 
     if (emailAlreadyExists)
@@ -27,17 +27,20 @@ export class AuthService {
 
     data.password = await argon2.hash(data.password);
 
-    const user = await this.prismaService.user.create({ data });
+    const user = await this.usersRepository.create(data);
 
-    delete user.password;
+    user.password = undefined;
 
     return user;
   }
 
   public async signin(data: AuthUserDto) {
-    const userExists = await this.prismaService.user.findFirst({
-      where: { email: data.email },
-    });
+    const userExists = await this.usersRepository.findOne(
+      {
+        email: data.email,
+      },
+      { password: 1 },
+    );
 
     if (!userExists) throw new UnauthorizedException('Invalid credentials!');
 
@@ -49,7 +52,7 @@ export class AuthService {
     if (!passwordsMatches)
       throw new UnauthorizedException('Invalid credentials!');
 
-    return await this.signToken(userExists.id);
+    return await this.signToken(userExists._id);
   }
 
   public async oAuthLogin(req) {

@@ -1,12 +1,12 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
+import { UsersRepository } from 'database/repositories';
 import { Strategy, VerifyCallback } from 'passport-google-oauth2';
-import { PrismaService } from 'prisma/prisma.service';
 
 @Injectable()
 export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
-  constructor(config: ConfigService, private prismaService: PrismaService) {
+  constructor(config: ConfigService, private usersRepository: UsersRepository) {
     super({
       clientID: config.get('GOOGLE_CLIENT_ID'),
       clientSecret: config.get('GOOGLE_SECRET'),
@@ -22,8 +22,8 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
     done: VerifyCallback,
   ) {
     try {
-      const userAlreadyExists = await this.prismaService.user.findUnique({
-        where: { googleId: profile.id },
+      const userAlreadyExists = await this.usersRepository.findOne({
+        googleId: profile.id,
       });
 
       if (userAlreadyExists) {
@@ -38,18 +38,14 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
         googleId: id,
       };
 
-      const emailAlreadyUsed = await this.prismaService.user.findFirst({
-        where: {
-          email: data.email,
-        },
+      const emailAlreadyUsed = await this.usersRepository.findOne({
+        email: data.email,
       });
 
       if (emailAlreadyUsed)
         throw new BadRequestException('The email is already used');
 
-      const newUser = await this.prismaService.user.create({
-        data,
-      });
+      const newUser = await this.usersRepository.create(data);
 
       return done(null, newUser);
     } catch (error) {
